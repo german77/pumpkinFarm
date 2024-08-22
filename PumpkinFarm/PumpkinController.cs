@@ -7,10 +7,13 @@ namespace PumpkinFarm {
         private Queue<Vector2Int> fillingSequence;
         private Dictionary<Vector2Int, Pumpkin> pumpkins = [];
         private Dictionary<Pumpkin, RectInt> groups = [];
+        private int[] dp;
 
         public PumpkinController(int size) {
             this.size = size;
             this.fillingSequence = NewFillingSequence();
+            dp = new int[size * size];
+            Clear();
         }
 
         public void AddPumpkin(Pumpkin p) {
@@ -41,6 +44,7 @@ namespace PumpkinFarm {
             fillingSequence = NewFillingSequence();
             pumpkins.Clear();
             groups.Clear();
+            Array.Clear(dp, 0, dp.Length);
         }
 
         private Queue<Vector2Int> NewFillingSequence() {
@@ -52,10 +56,8 @@ namespace PumpkinFarm {
         }
 
         private void MergeWithOthers(Vector2Int pos) {
-            int[] dp = new int[size * size];
-            for (int i = 0; i < dp.Length; i++) {
-                dp[i] = (pumpkins.ContainsKey(new Vector2Int(i % size, i / size)) ? 1 : 0);
-            }
+            dp[pos.x + (pos.y * size)] = 1;
+
             bool flag = true;
             int squareSize = 1;
             while (flag) {
@@ -66,22 +68,25 @@ namespace PumpkinFarm {
                     int y = j / size;
                     if (x + 1 < size && y + 1 < size &&
                         dp[j] == squareSize - 1 &&
-                        dp[x + 1 + size * y] == squareSize - 1 &&
-                        dp[x + size * (y + 1)] == squareSize - 1 &&
-                        dp[x + 1 + size * (y + 1)] == squareSize - 1) {
+                        dp[x + 1 + size * y] >= squareSize - 1 &&
+                        dp[x + size * (y + 1)] >= squareSize - 1 &&
+                        dp[x + 1 + size * (y + 1)] >= squareSize - 1) {
                         dp[j] = squareSize;
                         flag = true;
                     }
                 }
             }
             squareSize--;
-            RectInt val = LargestSquare(dp, size, squareSize, pos);
+            RectInt val = LargestSquare(size, squareSize, pos);
             foreach (Vector2Int item in IterPositions(val)) {
+                if (!pumpkins.ContainsKey(item)) {
+                    continue;
+                }
                 groups[pumpkins[item]] = val;
             }
         }
 
-        private RectInt LargestSquare(int[] dp, int n, int squareSize, Vector2Int pos) {
+        private RectInt LargestSquare(int n, int squareSize, Vector2Int pos) {
             RectInt val = new(new Vector2Int(), new Vector2Int());
             while (squareSize > 1) {
                 for (int i = 0; i < dp.Length; i++) {
@@ -97,6 +102,9 @@ namespace PumpkinFarm {
 
         private bool HasOverlaps(RectInt r) {
             foreach (Vector2Int item in IterPositions(r)) {
+                if (!pumpkins.ContainsKey(item)) {
+                    continue;
+                }
                 if (!groups.ContainsKey(pumpkins[item])) {
                     continue;
                 }
