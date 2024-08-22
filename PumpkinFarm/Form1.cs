@@ -2,7 +2,7 @@ namespace PumpkinFarm {
     public partial class Form1 : Form {
         private PumpkinController controller = new PumpkinController(10);
         private bool needsClear = false;
-        private bool isTimed = true;
+        private bool isTimed = false;
         private long totalTime = 0;
         private float runs = 0;
 
