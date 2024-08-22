@@ -4,11 +4,13 @@ namespace PumpkinFarm {
         public readonly int size;
 
         private Random rand = new Random();
+        private Queue<Vector2Int> fillingSequence;
         private Dictionary<Vector2Int, Pumpkin> pumpkins = [];
         private Dictionary<Pumpkin, RectInt> groups = [];
 
         public PumpkinController(int size) {
             this.size = size;
+            this.fillingSequence = NewFillingSequence();
         }
 
         public bool AddPumpkin(Pumpkin p) {
@@ -32,25 +34,24 @@ namespace PumpkinFarm {
             }
 
             Pumpkin p = new Pumpkin();
-            p.pos.x = rand.Next(size);
-            p.pos.y = rand.Next(size);
-            while (!AddPumpkin(p)) {
-                p.pos.x++;
-                if (p.pos.x >= size) {
-                    p.pos.y++;
-                    p.pos.x = 0;
-                    if (p.pos.y >= size) {
-                        p.pos.y = 0;
-                    }
-                }
-            }
+            p.pos = fillingSequence.Dequeue();
+            AddPumpkin(p);
 
             return true;
         }
 
         public void Clear() {
+            fillingSequence = NewFillingSequence();
             pumpkins.Clear();
             groups.Clear();
+        }
+
+        private Queue<Vector2Int> NewFillingSequence() {
+            return new Queue<Vector2Int>(
+                Enumerable.Range(0,size)
+                    .SelectMany((l) => Enumerable.Range(0,size), (l, r) => new Vector2Int(l, r))
+                    .OrderBy((item) => rand.Next())
+            );
         }
 
         private void MergeWithOthers(Vector2Int pos) {
