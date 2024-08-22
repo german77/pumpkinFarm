@@ -18,7 +18,6 @@ namespace PumpkinFarm {
             if (pumpkins.ContainsKey(val)) {
                 throw new Exception("can't add pumpkin to an occupied spot");
             }
-            //System.Diagnostics.Debug.WriteLine("Pumking added at "+p);
             pumpkins[val] = p;
             MergeWithOthers(val);
         }
@@ -46,37 +45,37 @@ namespace PumpkinFarm {
 
         private Queue<Vector2Int> NewFillingSequence() {
             return new Queue<Vector2Int>(
-                Enumerable.Range(0,size)
-                    .SelectMany((l) => Enumerable.Range(0,size), (l, r) => new Vector2Int(l, r))
+                Enumerable.Range(0, size)
+                    .SelectMany((l) => Enumerable.Range(0, size), (l, r) => new Vector2Int(l, r))
                     .OrderBy((item) => rand.Next())
             );
         }
 
         private void MergeWithOthers(Vector2Int pos) {
-            int[] array = new int[size * size];
-            for (int i = 0; i < array.Length; i++) {
-                array[i] = (pumpkins.ContainsKey(new Vector2Int(i % size, i / size)) ? 1 : 0);
+            int[] dp = new int[size * size];
+            for (int i = 0; i < dp.Length; i++) {
+                dp[i] = (pumpkins.ContainsKey(new Vector2Int(i % size, i / size)) ? 1 : 0);
             }
             bool flag = true;
-            int num2 = 1;
+            int squareSize = 1;
             while (flag) {
-                num2++;
+                squareSize++;
                 flag = false;
-                for (int j = 0; j < array.Length; j++) {
-                    int num3 = j % size;
-                    int num4 = j / size;
-                    if (num3 + 1 < size && num4 + 1 < size &&
-                        array[j] == num2 - 1 &&
-                        array[num3 + 1 + size * num4] == num2 - 1 &&
-                        array[num3 + size * (num4 + 1)] == num2 - 1 &&
-                        array[num3 + 1 + size * (num4 + 1)] == num2 - 1) {
-                        array[j] = num2;
+                for (int j = 0; j < dp.Length; j++) {
+                    int x = j % size;
+                    int y = j / size;
+                    if (x + 1 < size && y + 1 < size &&
+                        dp[j] == squareSize - 1 &&
+                        dp[x + 1 + size * y] == squareSize - 1 &&
+                        dp[x + size * (y + 1)] == squareSize - 1 &&
+                        dp[x + 1 + size * (y + 1)] == squareSize - 1) {
+                        dp[j] = squareSize;
                         flag = true;
                     }
                 }
             }
-            num2--;
-            RectInt val = LargestSquare(array, size, num2, pos);
+            squareSize--;
+            RectInt val = LargestSquare(dp, size, squareSize, pos);
             foreach (Vector2Int item in IterPositions(val)) {
                 groups[pumpkins[item]] = val;
             }
