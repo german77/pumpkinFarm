@@ -13,15 +13,14 @@ namespace PumpkinFarm {
             this.fillingSequence = NewFillingSequence();
         }
 
-        public bool AddPumpkin(Pumpkin p) {
+        public void AddPumpkin(Pumpkin p) {
             Vector2Int val = p.pos;
             if (pumpkins.ContainsKey(val)) {
-                return false;
+                throw new Exception("can't add pumpkin to an occupied spot");
             }
             //System.Diagnostics.Debug.WriteLine("Pumking added at "+p);
             pumpkins[val] = p;
             MergeWithOthers(val);
-            return true;
         }
 
         public void FillAll() {
