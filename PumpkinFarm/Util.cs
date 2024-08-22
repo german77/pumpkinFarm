@@ -53,7 +53,11 @@ namespace PumpkinFarm {
     }
 
     public class Pumpkin {
-        public Vector2Int pos = new();
+        public Vector2Int pos;
+
+        public Pumpkin(Vector2Int pos) {
+            this.pos = pos;
+        }
 
         public override string ToString() {
             return pos.ToString();
