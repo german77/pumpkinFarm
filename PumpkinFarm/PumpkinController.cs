@@ -102,7 +102,7 @@ namespace PumpkinFarm {
                             y = 0;
                         }
                         RectInt val = new(new Vector2Int(x, y), new Vector2Int(squareSize - 1, squareSize - 1));
-                        if (dp[x + (y * size)] >= squareSize && IsInRect(val,pos) && !HasOverlaps(val)) {
+                        if (dp[x + (y * size)] >= squareSize && IsInRect(val, pos) && !HasOverlaps(val)) {
                             return val;
                         }
                     }
@@ -113,7 +113,7 @@ namespace PumpkinFarm {
         }
 
         private bool HasOverlaps(RectInt r) {
-            foreach (Vector2Int item in IterPositions(r)) {
+            foreach (Vector2Int item in IterBorders(r)) {
                 if (!pumpkins.ContainsKey(item)) {
                     continue;
                 }
@@ -147,6 +147,17 @@ namespace PumpkinFarm {
                 for (int j = r.min.y; j <= r.max.y; j++) {
                     yield return new Vector2Int(i, j);
                 }
+            }
+        }
+
+        private IEnumerable<Vector2Int> IterBorders(RectInt r) {
+            for (int i = r.min.x; i <= r.max.x; i++) {
+                yield return new Vector2Int(i, r.min.y);
+                yield return new Vector2Int(i, r.max.y);
+            }
+            for (int j = r.min.y; j <= r.max.y; j++) {
+                yield return new Vector2Int(r.min.x, j);
+                yield return new Vector2Int(r.max.x, j);
             }
         }
 

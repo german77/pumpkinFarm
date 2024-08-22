@@ -1,6 +1,6 @@
 namespace PumpkinFarm {
     public partial class Form1 : Form {
-        private PumpkinController controller = new PumpkinController(10);
+        private PumpkinController controller = new PumpkinController(80);
         private bool needsClear = false;
         private bool isTimed = false;
         private long totalTime = 0;
