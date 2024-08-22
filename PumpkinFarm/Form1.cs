@@ -2,8 +2,8 @@ namespace PumpkinFarm {
     public partial class Form1 : Form {
         private PumpkinController controller = new PumpkinController(10);
         private bool needsClear = false;
-        private bool isTimed = false;
-        private long average = 0;
+        private bool isTimed = true;
+        private long totalTime = 0;
         private float runs = 0;
 
         public Form1() {
@@ -22,8 +22,8 @@ namespace PumpkinFarm {
                 watch.Stop();
                 needsClear = true;
                 runs++;
-                average += watch.ElapsedMilliseconds;
-                System.Diagnostics.Debug.WriteLine(runs + " Average:" + (average / runs) + " Time:" + watch.ElapsedMilliseconds);
+                totalTime += watch.ElapsedMilliseconds;
+                Console.WriteLine(runs + " Average:" + (totalTime / runs) + " Time:" + watch.ElapsedMilliseconds);
             } else {
                 // Visualization 
                 needsClear = !controller.FillNext();
