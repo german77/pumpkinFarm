@@ -63,16 +63,21 @@ namespace PumpkinFarm {
             while (flag) {
                 squareSize++;
                 flag = false;
-                for (int j = 0; j < dp.Length; j++) {
-                    int x = j % size;
-                    int y = j / size;
-                    if (x + 1 < size && y + 1 < size &&
-                        dp[j] == squareSize - 1 &&
-                        dp[x + 1 + size * y] >= squareSize - 1 &&
-                        dp[x + size * (y + 1)] >= squareSize - 1 &&
-                        dp[x + 1 + size * (y + 1)] >= squareSize - 1) {
-                        dp[j] = squareSize;
-                        flag = true;
+                for (int x = pos.x - squareSize; x < size - 1 && x < pos.x + squareSize; x++) {
+                    if (x < 0) {
+                        x = 0;
+                    }
+                    for (int y = pos.y - squareSize; y < size - 1 && y < pos.y + squareSize; y++) {
+                        if (y < 0) {
+                            y = 0;
+                        }
+                        if (dp[x + (y * size)] == squareSize - 1 &&
+                            dp[x + 1 + size * y] >= squareSize - 1 &&
+                            dp[x + size * (y + 1)] >= squareSize - 1 &&
+                            dp[x + 1 + size * (y + 1)] >= squareSize - 1) {
+                            dp[x + (y * size)] = squareSize;
+                            flag = true;
+                        }
                     }
                 }
             }
@@ -87,12 +92,19 @@ namespace PumpkinFarm {
         }
 
         private RectInt LargestSquare(int n, int squareSize, Vector2Int pos) {
-            RectInt val = new(new Vector2Int(), new Vector2Int());
             while (squareSize > 1) {
-                for (int i = 0; i < dp.Length; i++) {
-                    val = new(new Vector2Int(i % n, i / n), new Vector2Int(squareSize - 1, squareSize - 1));
-                    if (dp[i] >= squareSize && IsInRect(val, pos) && !HasOverlaps(val)) {
-                        return val;
+                for (int x = pos.x - squareSize; x < size && x < pos.x + squareSize; x++) {
+                    if (x < 0) {
+                        x = 0;
+                    }
+                    for (int y = pos.y - squareSize; y < size && y < pos.y + squareSize; y++) {
+                        if (y < 0) {
+                            y = 0;
+                        }
+                        RectInt val = new(new Vector2Int(x, y), new Vector2Int(squareSize - 1, squareSize - 1));
+                        if (dp[x + (y * size)] >= squareSize && IsInRect(val,pos) && !HasOverlaps(val)) {
+                            return val;
+                        }
                     }
                 }
                 squareSize--;
