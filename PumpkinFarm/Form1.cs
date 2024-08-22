@@ -1,11 +1,10 @@
 namespace PumpkinFarm {
     public partial class Form1 : Form {
-        PumpkinController controller = new PumpkinController();
-        Random rand = new Random();
-        bool needsClear = false;
-        bool isTimed = false;
-        long average = 0;
-        float runs = 0;
+        private PumpkinController controller = new PumpkinController(10);
+        private bool needsClear = false;
+        private bool isTimed = false;
+        private long average = 0;
+        private float runs = 0;
 
         public Form1() {
             InitializeComponent();

@@ -1,10 +1,15 @@
 ﻿
 namespace PumpkinFarm {
     public class PumpkinController {
+        public readonly int size;
+
         private Random rand = new Random();
         private Dictionary<Vector2Int, Pumpkin> pumpkins = [];
         private Dictionary<Pumpkin, RectInt> groups = [];
-        public readonly int size = 10;
+
+        public PumpkinController(int size) {
+            this.size = size;
+        }
 
         public bool AddPumpkin(Pumpkin p) {
             Vector2Int val = p.pos;
@@ -40,9 +45,7 @@ namespace PumpkinFarm {
                 }
             }
 
-
             return true;
-
         }
 
         public void Clear() {
