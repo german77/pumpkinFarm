@@ -33,8 +33,7 @@ namespace PumpkinFarm {
                 return false;
             }
 
-            Pumpkin p = new Pumpkin();
-            p.pos = fillingSequence.Dequeue();
+            Pumpkin p = new Pumpkin(fillingSequence.Dequeue());
             AddPumpkin(p);
 
             return true;
