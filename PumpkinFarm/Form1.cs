@@ -1,6 +1,6 @@
 namespace PumpkinFarm {
     public partial class Form1 : Form {
-        private PumpkinController controller = new PumpkinController(160);
+        private PumpkinController controller = new PumpkinController(80);
         private bool needsClear = false;
         private bool isTimed = true;
         private long totalTime = 0;
@@ -38,11 +38,12 @@ namespace PumpkinFarm {
 
             using (Graphics graphics = Graphics.FromImage(bmp)) {
                 graphics.Clear(Color.White);
-                foreach (var (key, item) in controller.GetGroups()) {
+                foreach (var item in controller.GetGroups()) {
+                    if(item==null) continue;
                     Rectangle rectangle = new Rectangle(
                         (item.min.x * spacing) + 10 + (rad / 2), (item.min.y * spacing) + 10 + (rad / 2),
                         (item.max.x - item.min.x) * spacing, (item.max.y - item.min.y) * spacing);
-                    //graphics.FillRectangle(orangeBrush, rectangle);
+                    graphics.FillRectangle(orangeBrush, rectangle);
                 }
                 int[] dp = controller.GetDp();
                 foreach (var pos in controller.GetPumkings()) {
@@ -50,7 +51,7 @@ namespace PumpkinFarm {
                         (pos.x * spacing) + 10,
                         (pos.y * spacing) + 10, rad, rad);
                     graphics.FillEllipse(redBrush, rectangle);
-                    //graphics.DrawString(dp[pos.x + pos.y * controller.size].ToString(),font, whiteBrush, (pos.x * spacing) + 10, (pos.y * spacing) + 10);
+                   // graphics.DrawString(dp[pos.x + pos.y * controller.size].ToString(),font, whiteBrush, (pos.x * spacing) + 10, (pos.y * spacing) + 10);
 
                 }
             }
