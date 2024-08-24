@@ -1,8 +1,8 @@
 namespace PumpkinFarm {
     public partial class Form1 : Form {
-        private PumpkinController controller = new PumpkinController(80);
+        private PumpkinController controller = new PumpkinController(160);
         private bool needsClear = false;
-        private bool isTimed = false;
+        private bool isTimed = true;
         private long totalTime = 0;
         private float runs = 0;
 
@@ -13,7 +13,9 @@ namespace PumpkinFarm {
 
         private void MainTimerEvent(object sender, EventArgs e) {
             SolidBrush orangeBrush = new SolidBrush(Color.Orange);
+            SolidBrush whiteBrush = new SolidBrush(Color.White);
             SolidBrush redBrush = new SolidBrush(Color.Red);
+            Font font = new Font("Arial", 14);
 
             if (isTimed) {
                 // Timed Run
@@ -40,13 +42,15 @@ namespace PumpkinFarm {
                     Rectangle rectangle = new Rectangle(
                         (item.min.x * spacing) + 10 + (rad / 2), (item.min.y * spacing) + 10 + (rad / 2),
                         (item.max.x - item.min.x) * spacing, (item.max.y - item.min.y) * spacing);
-                    graphics.FillRectangle(orangeBrush, rectangle);
+                    //graphics.FillRectangle(orangeBrush, rectangle);
                 }
-                foreach (var (key, item) in controller.GetPumkings()) {
+                int[] dp = controller.GetDp();
+                foreach (var pos in controller.GetPumkings()) {
                     Rectangle rectangle = new Rectangle(
-                        (key.x * spacing) + 10,
-                        (key.y * spacing) + 10, rad, rad);
+                        (pos.x * spacing) + 10,
+                        (pos.y * spacing) + 10, rad, rad);
                     graphics.FillEllipse(redBrush, rectangle);
+                    //graphics.DrawString(dp[pos.x + pos.y * controller.size].ToString(),font, whiteBrush, (pos.x * spacing) + 10, (pos.y * spacing) + 10);
 
                 }
             }

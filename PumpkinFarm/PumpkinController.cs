@@ -1,13 +1,15 @@
 ﻿
+using System.Drawing;
+
 namespace PumpkinFarm {
     public class PumpkinController {
         public readonly int size;
 
         private Random rand = new Random();
         private Queue<Vector2Int> fillingSequence;
-        private Dictionary<Vector2Int, Pumpkin> pumpkins = [];
-        private Dictionary<Pumpkin, RectInt> groups = [];
+        private Dictionary<Vector2Int, RectInt> groups = [];
         private int[] dp;
+        private int pCount;
 
         public PumpkinController(int size) {
             this.size = size;
@@ -16,13 +18,18 @@ namespace PumpkinFarm {
             Clear();
         }
 
+        private bool HasPumpkin(Vector2Int pos) {
+            return dp[pos.x + pos.y * size] > 0;
+        }
+
         public void AddPumpkin(Pumpkin p) {
-            Vector2Int val = p.pos;
-            if (pumpkins.ContainsKey(val)) {
+            Vector2Int pos = p.pos;
+            if (HasPumpkin(pos)) {
                 throw new Exception("can't add pumpkin to an occupied spot");
             }
-            pumpkins[val] = p;
-            MergeWithOthers(val);
+            dp[pos.x + (pos.y * size)] = 1;
+            pCount++;
+            MergeWithOthers(pos);
         }
 
         public void FillAll() {
@@ -30,7 +37,7 @@ namespace PumpkinFarm {
         }
 
         public bool FillNext() {
-            if (pumpkins.Count >= size * size) {
+            if (pCount >= size * size) {
                 return false;
             }
 
@@ -42,9 +49,9 @@ namespace PumpkinFarm {
 
         public void Clear() {
             fillingSequence = NewFillingSequence();
-            pumpkins.Clear();
             groups.Clear();
             Array.Clear(dp, 0, dp.Length);
+            pCount = 0;
         }
 
         private Queue<Vector2Int> NewFillingSequence() {
@@ -56,18 +63,17 @@ namespace PumpkinFarm {
         }
 
         private void MergeWithOthers(Vector2Int pos) {
-            dp[pos.x + (pos.y * size)] = 1;
-
             bool flag = true;
             int squareSize = 1;
+
             while (flag) {
                 squareSize++;
                 flag = false;
-                for (int x = pos.x - squareSize; x < size - 1 && x < pos.x + squareSize; x++) {
+                for (int x = pos.x - squareSize; x < size - 1 && x <= pos.x; x++) {
                     if (x < 0) {
                         x = 0;
                     }
-                    for (int y = pos.y - squareSize; y < size - 1 && y < pos.y + squareSize; y++) {
+                    for (int y = pos.y- squareSize; y < size - 1 && y <= pos.y ; y++) {
                         if (y < 0) {
                             y = 0;
                         }
@@ -81,23 +87,21 @@ namespace PumpkinFarm {
                     }
                 }
             }
+
             squareSize--;
-            RectInt val = LargestSquare(size, squareSize, pos);
+            RectInt val = LargestSquare(squareSize, pos);
             foreach (Vector2Int item in IterPositions(val)) {
-                if (!pumpkins.ContainsKey(item)) {
-                    continue;
-                }
-                groups[pumpkins[item]] = val;
+                groups[item] = val;
             }
         }
 
-        private RectInt LargestSquare(int n, int squareSize, Vector2Int pos) {
+        private RectInt LargestSquare(int squareSize, Vector2Int pos) {
             while (squareSize > 1) {
-                for (int x = pos.x - squareSize; x < size && x < pos.x + squareSize; x++) {
+                for (int x = pos.x - squareSize; x < size && x <= pos.x; x++) {
                     if (x < 0) {
                         x = 0;
                     }
-                    for (int y = pos.y - squareSize; y < size && y < pos.y + squareSize; y++) {
+                    for (int y = pos.y - squareSize; y < size && y <= pos.y; y++) {
                         if (y < 0) {
                             y = 0;
                         }
@@ -114,13 +118,13 @@ namespace PumpkinFarm {
 
         private bool HasOverlaps(RectInt r) {
             foreach (Vector2Int item in IterBorders(r)) {
-                if (!pumpkins.ContainsKey(item)) {
+                if (!HasPumpkin(item)) {
                     continue;
                 }
-                if (!groups.ContainsKey(pumpkins[item])) {
+                if (!groups.ContainsKey(item)) {
                     continue;
                 }
-                RectInt val = groups[pumpkins[item]];
+                RectInt val = groups[item];
                 if (val.max.x <= r.max.x) {
                     if (val.max.y <= r.max.y) {
                         if (val.min.x >= r.min.x) {
@@ -161,12 +165,23 @@ namespace PumpkinFarm {
             }
         }
 
-        public Dictionary<Vector2Int, Pumpkin> GetPumkings() {
-            return pumpkins;
+        public IEnumerable<Vector2Int> GetPumkings() {
+            for (int x = 0; x < size ; x++) {
+                for (int y = 0; y < size; y++) {
+                    if (dp[x+y*size] == 0) {
+                        continue;
+                    }
+                    yield return new Vector2Int(x, y);
+                }
+            }
         }
 
-        public Dictionary<Pumpkin, RectInt> GetGroups() {
+        public Dictionary<Vector2Int, RectInt> GetGroups() {
             return groups;
+        }
+
+        public int[] GetDp() {
+            return dp;
         }
     }
 }
